@@ -83,6 +83,16 @@ public class Flatmap {
         }
         return res;
     }
+    
+    public static List<Integer> BetterIncSum(List<Integer> src) {
+        List<Integer> res = new ArrayList<Integer>();
+        int accumulator = 0;
+        for (Integer n : src) {
+            accumulator += n;
+            res.add(accumulator);
+        }
+        return res;
+    }
 
 }
 

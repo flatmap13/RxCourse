@@ -7,14 +7,14 @@ import java.util.List;
 
 public class Flatmap {
 
-    public List<Integer> repeat(int n) {
+    public static List<Integer> repeat(int n) {
         List<Integer> xs = new ArrayList<Integer>();
         for (int i = 0; i < n; i++)
             xs.add(n);
         return xs;
     }
 
-    public <T,S> List<S> flatMap(List<T> src, Func1<T, List<S>> f) {
+    public static <T,S> List<S> flatMap(List<T> src, Func1<T, List<S>> f) {
         List<S> res = new ArrayList<S>();
         for (T x : src) {
             List<S> ys = f.call(x);
@@ -25,7 +25,7 @@ public class Flatmap {
         return res;
     }
 
-    public <T,S> List<S> map(List<T> src, Func1<T, S> f) {
+    public static <T,S> List<S> map(List<T> src, Func1<T, S> f) {
         return flatMap(src, new Func1<T, List<S>>() {
             @Override
             public List<S> call(T t) {
@@ -34,7 +34,7 @@ public class Flatmap {
         });
     }
 
-    public <T> List<T> filter(List<T> src, Func1<T, Boolean> f) {
+    public static <T> List<T> filter(List<T> src, Func1<T, Boolean> f) {
         return flatMap(src, new Func1<T, List<T>>() {
             @Override
             public List<T> call(T t) {
@@ -44,7 +44,7 @@ public class Flatmap {
         });
     }
 
-    public <T,S> List<Pair<T,S>> crossProduct(List<T> xs, List<S> ys) {
+    public static <T,S> List<Pair<T,S>> crossProduct(List<T> xs, List<S> ys) {
         return flatMap(xs, new Func1<T, List<Pair<T,S>>> () {
             @Override
             public List<Pair<T, S>> call(T x) {
@@ -58,7 +58,7 @@ public class Flatmap {
         });
     }
 
-    public <T,S,U> List<U> crossProductWith(List<T> xs, List<S> ys, Func2<T, S, U> f) {
+    public static <T,S,U> List<U> crossProductWith(List<T> xs, List<S> ys, Func2<T, S, U> f) {
         return flatMap(xs, new Func1<T, List<U>> () {
             @Override
             public List<U> call(T x) {
@@ -72,6 +72,18 @@ public class Flatmap {
         });
     }
 
+    public static List<Integer> IncSum(List<Integer> src) {
+        List<Integer> res = new ArrayList<Integer>();
+        if (!src.isEmpty()) {
+            res.add(src.get(0));
+            for (int i = 1; i < src.size(); i++) {
+                int n = src.get(i);
+                res.add(n + res.get(i - 1));
+            }
+        }
+        return res;
+    }
+
 }
 
 class Pair<T,S> {
@@ -83,4 +95,3 @@ class Pair<T,S> {
         this.y = y;
     }
 }
-

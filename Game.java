@@ -1,4 +1,5 @@
 import rx.Observable;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 import java.util.Date;
@@ -18,9 +19,13 @@ public class Game {
             public Boolean call(Date date) {
                 return date.getSeconds() % 2 == 0;
             }
-        }).take(100).subscribe(System.out::println);
+        }).take(100).subscribe(new Action1<Date>() {
+            @Override
+            public void call(Date date) {
+                System.out.println(date);
+            }
+        });
 
         System.in.read();
     }
 }
-

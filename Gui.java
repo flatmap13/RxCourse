@@ -1,6 +1,7 @@
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.subscriptions.Subscriptions;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class Gui {
 
         final JButton button = new JButton("click me");
 
-        final Observable<ActionEvent> events = Observable.create(
+        final Observable<ActionEvent> buttonClicks = Observable.create(
                 new Observable.OnSubscribe<ActionEvent>() {
             @Override
             public void call(Subscriber<? super ActionEvent> subscriber) {
@@ -48,7 +49,12 @@ public class Gui {
             }
         });
 
-        events.subscribe(x -> label.setText("Number of clicks: " + ++numClicks));
+        buttonClicks.subscribe(new Action1<ActionEvent>() {
+            @Override
+            public void call(ActionEvent x) {
+                label.setText("Number of clicks: " + ++numClicks);
+            }
+        });
 
         panel.add(label);
         panel.add(button);

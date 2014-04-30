@@ -1,8 +1,10 @@
 import rx.Observable;
 import rx.Scheduler;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import rx.schedulers.TestScheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +19,8 @@ public class StockParser {
     public static void parseFile(String filename) throws IOException {
         Scanner scanner = new Scanner(new File(filename));
 
-        Scheduler scheduler = Schedulers.newThread();
+        //Scheduler scheduler = Schedulers.newThread();
+        TestScheduler scheduler = Schedulers.test();
 
         Observable<Stock> stocks = Observable.create(new rx.Observable.OnSubscribe<Stock>() {
             @Override
@@ -25,44 +28,35 @@ public class StockParser {
                 scheduler.schedule(new Action1<Scheduler.Inner>() {
                     @Override
                     public void call(Scheduler.Inner inner) {
+                        try {
+                            if (scanner.hasNextLine()) {
+                                Stock stock = parseLine(scanner.nextLine());
+                                subscriber.onNext(stock);
+                            } else {
+                                subscriber.onCompleted();
+                            }
+                        } catch(Throwable t) {
+                            subscriber.onError(t);
+                        }
+
+                        final Action1<Scheduler.Inner> innerAction = this;
                         inner.schedule(new Action1<Scheduler.Inner>() {
                             @Override
                             public void call(Scheduler.Inner inner) {
-
-                                try {
-                                    if (scanner.hasNextLine()) {
-                                        Stock stock = parseLine(scanner.nextLine());
-                                        subscriber.onNext(stock);
-                                    } else {
-                                        subscriber.onCompleted();
-                                    }
-                                } catch(Throwable t) {
-                                    subscriber.onError(t);
-                                }
-
-                                final Action1<Scheduler.Inner> innerAction = this;
-                                inner.schedule(new Action1<Scheduler.Inner>() {
-                                    @Override
-                                    public void call(Scheduler.Inner inner) {
-                                        innerAction.call(inner);
-                                    }
-                                }, 1, TimeUnit.SECONDS);
-
+                                innerAction.call(inner);
                             }
-                        });
+                        }, 1, TimeUnit.SECONDS);
                     }
                 });
             }
         });
 
-        stocks.subscribe(new Action1<Stock>() {
-            @Override
-            public void call(Stock stock) {
-                System.out.println(stock);
-            }
-        });
+        Subscription subscription = stocks.timestamp(scheduler).subscribe(System.out::println);
 
-        System.in.read();
+        while (!subscription.isUnsubscribed()) {
+            System.in.read();
+            scheduler.advanceTimeBy(1, TimeUnit.SECONDS);
+        }
     }
 
     public static Stock parseLine(String line) {

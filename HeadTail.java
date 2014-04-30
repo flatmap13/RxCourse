@@ -11,9 +11,9 @@ class HeadTail {
         Observable<Cons<Integer>> cons = headTail(Observable.from(items));
 
         cons.subscribe(headTail -> {
-            System.out.println(headTail.head);
+            System.out.println("Head: " + headTail.head);
             headTail.tail.subscribe(x -> {
-                System.out.println(x);});
+                System.out.println("Tail: " + x);});
         });
     }
 

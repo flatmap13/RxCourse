@@ -14,9 +14,9 @@ public class Flatmap {
         return xs;
     }
 
-    public static <T,S> List<S> flatMap(List<T> src, Func1<T, List<S>> f) {
+    public static <T,S> List<S> flatMap(List<T> xs, Func1<T, List<S>> f) {
         List<S> res = new ArrayList<S>();
-        for (T x : src) {
+        for (T x : xs) {
             List<S> ys = f.call(x);
             for (S y : ys) {
                 res.add(y);
@@ -25,20 +25,20 @@ public class Flatmap {
         return res;
     }
 
-    public static <T,S> List<S> map(List<T> src, Func1<T, S> f) {
-        return flatMap(src, new Func1<T, List<S>>() {
+    public static <T,S> List<S> map(List<T> xs, Func1<T, S> f) {
+        return flatMap(xs, new Func1<T, List<S>>() {
             @Override
-            public List<S> call(T t) {
-                return Collections.singletonList(f.call(t));
+            public List<S> call(T x) {
+                return Collections.singletonList(f.call(x));
             }
         });
     }
 
-    public static <T> List<T> filter(List<T> src, Func1<T, Boolean> f) {
-        return flatMap(src, new Func1<T, List<T>>() {
+    public static <T> List<T> filter(List<T> xs, Func1<T, Boolean> f) {
+        return flatMap(xs, new Func1<T, List<T>>() {
             @Override
-            public List<T> call(T t) {
-                return f.call(t) ? Collections.singletonList(t)
+            public List<T> call(T x) {
+                return f.call(x) ? Collections.singletonList(x)
                                  : Collections.emptyList();
             }
         });
@@ -73,18 +73,6 @@ public class Flatmap {
     }
 
     public static List<Integer> IncSum(List<Integer> src) {
-        List<Integer> res = new ArrayList<Integer>();
-        if (!src.isEmpty()) {
-            res.add(src.get(0));
-            for (int i = 1; i < src.size(); i++) {
-                int n = src.get(i);
-                res.add(n + res.get(i - 1));
-            }
-        }
-        return res;
-    }
-    
-    public static List<Integer> BetterIncSum(List<Integer> src) {
         List<Integer> res = new ArrayList<Integer>();
         int accumulator = 0;
         for (Integer n : src) {
